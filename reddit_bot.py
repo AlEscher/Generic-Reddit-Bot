@@ -52,7 +52,7 @@ for mention in reddit.inbox.mentions():
             reply = reply + " \n[Your best-scoring comment](" + best_comment.permalink + ")"
         # if the user has a comment other than the initial mention with less than 1 upvote, this should not be None
         if worst_comment is not None:
-            reply = reply + " \n[Your worst-scoring comment](" + worst_comment.permalink + ")"
+            reply = reply + " \n\n[Your worst-scoring comment](" + worst_comment.permalink + ")"
         mention.reply(reply)
         # update both our lists with the new ID
         mentions_replied_to.append(mention.id)
