@@ -15,8 +15,8 @@ If you want to set up your own bot with this code you will need 2 things:
 
 ## Usage
 If the bot is online, commenting `u/All_isGone` under any post will trigger the bot.
-If you host the bot yourself, write `u/BOTS_USERNAME` instead
-While testing the bot, *please* use this [subreddit](https://www.reddit.com/r/pythonforengineers/) as it was made exactly for that and won't get the bot banned.
+If you host the bot yourself, write `u/BOTS_USERNAME` instead.
+While testing the bot, ***please*** use this [subreddit](https://www.reddit.com/r/pythonforengineers/) as it was made exactly for that and won't get the bot banned.
 
 ## Preview
 
