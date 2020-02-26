@@ -2,6 +2,7 @@ import praw
 import pdb
 import re
 import os
+import sys
 
 # open reddit instance with settings specified in your praw.ini under "[GeneralInfoBot]"
 reddit = praw.Reddit("GeneralInfoBot")
@@ -33,32 +34,47 @@ for mention in reddit.inbox.mentions():
         worst_comment = None
         # Reddit's API limits this to 1000
         comments = mention_author.comments.new(limit=1000)
-        for comment in comments:
+        # we need the list 2 times because if we call list() on comments and then try to iterate through it, the for loop will be skipped
+        comments_snd = mention_author.comments.new(limit=1000)
+        # keep track of our progress
+        num_of_comments = len(list(comments))
+        print("> Reading u/" + mention_author.name + "'s comments")
+        progress_counter = 1
+        for comment in comments_snd:
+            # a simple way of displaying our progress
+            print("> Completed %d%%" % int((progress_counter / num_of_comments) * 100), end='\r')
+            sys.stdout.flush()
             if comment.score > highest_score:
                 best_comment = comment
                 highest_score = comment.score
             elif comment.score < lowest_score:
                 worst_comment = comment
                 lowest_score = comment.score
+            progress_counter += 1
         
+        print("\n")
         print(10*'-' + "Info" + 10*'-')
         print("Replying to: " + mention_author.name + "\nComment ID: " + mention.id + "\nContent: " + mention.body)
         print(24*'-')
         
         # start building our response
-        reply = "Hello u/" + mention_author.name + " \n\nYou gained " + str(mention_author.link_karma) + " karma from posts and " + str(mention_author.comment_karma) + " from your comments\n"
+        reply = "Hello u/" + mention_author.name + ", \n\nYou gained " + str(mention_author.link_karma) + " karma from posts and " + str(mention_author.comment_karma) + " from your comments\n"
         # if the user has a comment other than the initial mention with more than 1 upvote, this should not be None
         if best_comment is not None:
             reply = reply + " \n[Your best-scoring comment](" + best_comment.permalink + ")"
         # if the user has a comment other than the initial mention with less than 1 upvote, this should not be None
         if worst_comment is not None:
             reply = reply + " \n\n[Your worst-scoring comment](" + worst_comment.permalink + ")"
+        # post our reply
         mention.reply(reply)
         # update both our lists with the new ID
         mentions_replied_to.append(mention.id)
         new_post_ids.append(mention.id)
-
-# update our file of post IDs we replied to
-with open(log_filename, "a") as f:
-    for post_id in new_post_ids:
-        f.write(post_id + "\n")
+        
+if not new_post_ids:
+    print("> No new mentions!")
+else:
+    # update our file of post IDs we replied to
+    with open(log_filename, "a") as f:
+        for post_id in new_post_ids:
+            f.write(post_id + "\n")
